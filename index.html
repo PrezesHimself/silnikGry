@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
+<canvas id="background"></canvas>
 		<div id="container"></div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
@@ -34,6 +34,8 @@
 			uniform float time;
       uniform vec2 resolution;  
       uniform vec2 mouse; 
+      uniform sampler2D colorTexture;
+      uniform sampler2D normalMap;
 
       highp float rand(vec2 co)
       {
@@ -48,11 +50,45 @@
 			void main()	{
         vec2 mousePosition = mouse / resolution;
         mousePosition.y = 1.0 - mousePosition.y;
-        float mouseDistance = distance(mousePosition, vUv);
-				gl_FragColor = vec4(
-          mouseDistance,
-          mouseDistance,
-          mouseDistance,
+        float mouseDistance = 1.0 - (distance(mousePosition, vUv)*2.0);
+
+        vec4 bgColor = texture2D(colorTexture, vUv );
+        vec4 normal = texture2D(normalMap, vUv);
+
+        float bRed = bgColor.r;
+        float bGreen = bgColor.g;
+        float bBlue = bgColor.b;
+
+        float tRed = mouseDistance;
+        float tGreen = mouseDistance;
+        float tBlue = mouseDistance;
+
+        vec4 ambient = vec4(0.2, 0.05, 0.05, 1.0);
+
+        float fRed = bRed < 0.5
+          ? 2.0 * bRed * tRed 
+          : 1.0 - 2.0 * ( (1.0 - bRed) * (1.0 - tRed) );
+
+        float fGreen = bGreen < 0.5
+          ? 2.0 * bGreen * tGreen 
+          : 1.0 - 2.0 * ( (1.0 - bGreen) * (1.0 - tGreen) );
+
+        float fBlue = bBlue < 0.5
+          ? 2.0 * bBlue * tBlue 
+          : 1.0 - 2.0 * ( (1.0 - bBlue) * (1.0 - tBlue) );
+
+        vec3 light_dir = vec3(
+          mousePosition.x,
+          mousePosition.y,
+          0.5
+        );
+
+        vec3 norm = normalize(texture2D(normalMap, vUv).rgb * 2.0 - 1.0);
+        float diffuse = max(dot(light_dir, norm), 0.0);
+        gl_FragColor = vec4(
+          diffuse * bgColor.r + ambient.r,
+          diffuse * bgColor.g + ambient.g,
+          diffuse * bgColor.b + ambient.b,
           1.0
         );
 
