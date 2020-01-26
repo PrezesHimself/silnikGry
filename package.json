@@ -1,0 +1,9 @@
+{
+  "name": "js-a9gcaw",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "stats.js": "^1.0.0",
+    "three": "0.112.1"
+  }
+}

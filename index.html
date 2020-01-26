@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shader [Monjori]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main()	{
+
+				vUv = uv;
+
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			
+      varying vec2 vUv;
+
+      const float speed     = 0.01;                      
+      const float frequency = 12.0;  
+
+			uniform float time;
+      uniform vec2 resolution;  
+      uniform vec2 mouse; 
+
+      highp float rand(vec2 co)
+      {
+          highp float a = 12.9898;
+          highp float b = 78.233;
+          highp float c = 43758.5453;
+          highp float dt= dot(co.xy ,vec2(a,b));
+          highp float sn= mod(dt,3.14);
+          return fract(sin(sn) * c);
+      }
+
+			void main()	{
+        vec2 mousePosition = mouse / resolution;
+        mousePosition.y = 1.0 - mousePosition.y;
+        float mouseDistance = distance(mousePosition, vUv);
+				gl_FragColor = vec4(
+          mouseDistance,
+          mouseDistance,
+          mouseDistance,
+          1.0
+        );
+
+			}
+
+		</script>
+    
